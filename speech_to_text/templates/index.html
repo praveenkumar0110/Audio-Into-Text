@@ -2,53 +2,187 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Speech to Text (Hugging Face)</title>
+  <title>🎤 Speech to Text (Hugging Face)</title>
   <style>
+    /* ======= Base ======= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial;
-      background: #121212;
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       color: #fff;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      overflow: hidden;
     }
+
+    /* ======= Animated Background ======= */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 25% 25%, rgba(255,0,150,0.3), transparent 40%),
+                  radial-gradient(circle at 75% 75%, rgba(0,200,255,0.3), transparent 40%);
+      animation: moveBackground 10s infinite alternate ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes moveBackground {
+      from { transform: translate(-10%, -10%) scale(1); }
+      to { transform: translate(10%, 10%) scale(1.2); }
+    }
+
+    /* ======= Container ======= */
     .container {
-      background: rgba(255,255,255,0.1);
-      padding: 20px 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255,255,255,0.2);
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 30px 50px;
       width: 450px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
       text-align: center;
+      animation: fadeIn 1.5s ease forwards;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* ======= Header ======= */
+    h2 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+      animation: glowText 2s infinite alternate;
+    }
+
+    @keyframes glowText {
+      from { text-shadow: 0 0 10px #ff00cc; }
+      to { text-shadow: 0 0 20px #ff9900; }
+    }
+
+    p.subtitle {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 15px;
+    }
+
+    /* ======= Inputs ======= */
     input[type="file"], button {
+      width: 100%;
       margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
     }
+
+    input[type="file"] {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    input[type="file"]:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
     button {
       background: linear-gradient(45deg, #ff007a, #ff9900);
       color: #fff;
       cursor: pointer;
+      font-weight: bold;
+      transition: 0.4s;
+      position: relative;
+      overflow: hidden;
     }
+
+    button::before {
+      content: "🎧";
+      position: absolute;
+      left: 15px;
+      opacity: 0;
+      transition: 0.3s;
+    }
+
+    button:hover::before {
+      opacity: 1;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 153, 0, 0.6);
+    }
+
+    /* ======= Output ======= */
     .output {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.1);
+      margin-top: 25px;
+      background: rgba(255,255,255,0.15);
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 10px;
       text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+      animation: slideUp 1.2s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .output h3 {
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #ffcc70;
+    }
+
+    /* ======= Floating Emojis ======= */
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0.7;
+      animation: floatEmojis 8s infinite ease-in-out;
+    }
+
+    .emoji:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+    .emoji:nth-child(2) { bottom: 15%; right: 20%; animation-delay: 2s; }
+    .emoji:nth-child(3) { top: 50%; right: 10%; animation-delay: 4s; }
+
+    @keyframes floatEmojis {
+      0%, 100% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-20px); opacity: 1; }
     }
   </style>
 </head>
 <body>
+  <div class="emoji">🎵</div>
+  <div class="emoji">🎤</div>
+  <div class="emoji">🎶</div>
+
   <div class="container">
-    <h2>🎙️ Upload Audio to Convert Text</h2>
+    <h2>🎙️ Speech to Text</h2>
+    <p class="subtitle">Upload your audio file & let AI transcribe it magically ✨</p>
+
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" name="audio" accept="audio/*" required>
-      <button type="submit">Convert</button>
+      <button type="submit">🚀 Convert Now</button>
     </form>
 
     {% if text %}
@@ -56,6 +190,7 @@
       <h3>📝 Transcribed Text</h3>
       <p id="textDisplay"></p>
     </div>
+
     <script>
       const text = `{{ text }}`;
       const textElement = document.getElementById('textDisplay');
