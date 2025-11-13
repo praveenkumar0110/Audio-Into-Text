@@ -2,209 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🎤 Speech to Text (Hugging Face)</title>
+  <title>🎤 Audio to Text (AI Magic)</title>
   <style>
-    /* ======= Base ======= */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: "Poppins", Arial, sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #2b0a4e, #4a148c);
       color: #fff;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       overflow: hidden;
-    }
-
-    /* ======= Animated Background ======= */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle at 25% 25%, rgba(255,0,150,0.3), transparent 40%),
-                  radial-gradient(circle at 75% 75%, rgba(0,200,255,0.3), transparent 40%);
-      animation: moveBackground 10s infinite alternate ease-in-out;
-      z-index: 0;
-    }
-
-    @keyframes moveBackground {
-      from { transform: translate(-10%, -10%) scale(1); }
-      to { transform: translate(10%, 10%) scale(1.2); }
-    }
-
-    /* ======= Container ======= */
-    .container {
       position: relative;
-      z-index: 2;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
+    }
+
+    
+    .emoji {
+      position: absolute;
+      font-size: 24px;
+      opacity: 0.7;
+      animation: float 6s infinite ease-in-out;
+    }
+    .emoji:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+    .emoji:nth-child(2) { top: 50%; left: 10%; animation-delay: 1s; }
+    .emoji:nth-child(3) { top: 80%; right: 8%; animation-delay: 2s; }
+    .emoji:nth-child(4) { top: 30%; right: 12%; animation-delay: 3s; }
+
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 0.8; }
+      50% { transform: translateY(-15px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 0.8; }
+    }
+
+    .container {
+      background: rgba(255,255,255,0.1);
       padding: 30px 50px;
-      width: 450px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(255,255,255,0.2);
       text-align: center;
-      animation: fadeIn 1.5s ease forwards;
+      backdrop-filter: blur(8px);
+      width: 420px;
+      margin-top: 50px;
+      z-index: 10;
+      animation: fadeInUp 1s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+    @keyframes fadeInUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    /* ======= Header ======= */
     h2 {
-      font-size: 1.6rem;
+      color: #ffccff;
+      font-size: 24px;
       margin-bottom: 10px;
-      animation: glowText 2s infinite alternate;
     }
 
-    @keyframes glowText {
-      from { text-shadow: 0 0 10px #ff00cc; }
-      to { text-shadow: 0 0 20px #ff9900; }
-    }
-
-    p.subtitle {
-      font-size: 0.9rem;
+    p.sub {
+      font-size: 13px;
       opacity: 0.8;
-      margin-bottom: 15px;
-    }
-
-    /* ======= Inputs ======= */
-    input[type="file"], button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      outline: none;
     }
 
     input[type="file"] {
-      background: rgba(255, 255, 255, 0.15);
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: rgba(255,255,255,0.2);
       color: #fff;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    input[type="file"]:hover {
-      background: rgba(255, 255, 255, 0.25);
     }
 
     button {
-      background: linear-gradient(45deg, #ff007a, #ff9900);
-      color: #fff;
-      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
       font-weight: bold;
-      transition: 0.4s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    button::before {
-      content: "🎧";
-      position: absolute;
-      left: 15px;
-      opacity: 0;
-      transition: 0.3s;
-    }
-
-    button:hover::before {
-      opacity: 1;
+      color: #fff;
+      background: linear-gradient(45deg, #ff007a, #ff9900);
+      cursor: pointer;
+      transition: transform 0.2s ease;
     }
 
     button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 153, 0, 0.6);
     }
 
-    /* ======= Output ======= */
-    .output {
-      margin-top: 25px;
-      background: rgba(255,255,255,0.15);
-      padding: 15px;
-      border-radius: 10px;
-      text-align: left;
-      max-height: 200px;
-      overflow-y: auto;
-      box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
-      animation: slideUp 1.2s ease;
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .output h3 {
-      margin-bottom: 10px;
+    /* Lyrics Section */
+    .lyrics {
+      margin-top: 40px;
+      font-size: 1.3rem;
+      line-height: 1.8;
+      width: 90%;
       text-align: center;
-      font-size: 1.2rem;
-      color: #ffcc70;
+      white-space: pre-wrap;
+      animation: fadeInLyrics 1.2s ease forwards;
     }
 
-    /* ======= Floating Emojis ======= */
-    .emoji {
-      position: absolute;
-      font-size: 2rem;
-      opacity: 0.7;
-      animation: floatEmojis 8s infinite ease-in-out;
-    }
-
-    .emoji:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
-    .emoji:nth-child(2) { bottom: 15%; right: 20%; animation-delay: 2s; }
-    .emoji:nth-child(3) { top: 50%; right: 10%; animation-delay: 4s; }
-
-    @keyframes floatEmojis {
-      0%, 100% { transform: translateY(0); opacity: 0.8; }
-      50% { transform: translateY(-20px); opacity: 1; }
+    @keyframes fadeInLyrics {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
+
 <body>
+  <!-- Floating emojis 🎵 -->
   <div class="emoji">🎵</div>
-  <div class="emoji">🎤</div>
   <div class="emoji">🎶</div>
+  <div class="emoji">🎤</div>
+  <div class="emoji">🎧</div>
 
   <div class="container">
-    <h2>🎙️ Speech to Text</h2>
-    <p class="subtitle">Upload your audio file & let AI transcribe it magically ✨</p>
-
+    <h2>🎙️ Audio to Text</h2>
+    <p class="sub">Upload your audio file & let AI transcribe it magically ✨</p>
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" name="audio" accept="audio/*" required>
-      <button type="submit">🚀 Convert Now</button>
+      <button type="submit">🎧 Convert Now</button>
     </form>
-
-    {% if text %}
-    <div class="output">
-      <h3>📝 Transcribed Text</h3>
-      <p id="textDisplay"></p>
-    </div>
-
-    <script>
-      const text = `{{ text }}`;
-      const textElement = document.getElementById('textDisplay');
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < text.length) {
-          textElement.textContent += text[i];
-          i++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 40);
-    </script>
-    {% endif %}
   </div>
+
+  {% if text %}
+ 
+  <div class="lyrics" id="lyricsDisplay"></div>
+
+  <script>
+    const lyricsText = `{{ text }}`;
+    const display = document.getElementById("lyricsDisplay");
+    const lines = lyricsText.split(/[\n\.]/).filter(l => l.trim() !== "");
+    let i = 0;
+
+    function showNextLine() {
+      if (i < lines.length) {
+        const line = document.createElement("div");
+        line.textContent = lines[i];
+        line.style.opacity = "0";
+        display.appendChild(line);
+
+        setTimeout(() => {
+          line.style.transition = "opacity 1s ease";
+          line.style.opacity = "1";
+        }, 50);
+
+        i++;
+        setTimeout(showNextLine, 1500); 
+      }
+    }
+
+    showNextLine();
+  </script>
+  {% endif %}
 </body>
 </html>
