@@ -15,7 +15,6 @@ def index(request):
                 tmp.write(chunk)
             tmp_path = tmp.name
 
-       
         result =  model(tmp_path, return_timestamps=True)
         text = result["text"]
 
