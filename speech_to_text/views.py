@@ -7,7 +7,7 @@ model = pipeline("automatic-speech-recognition", model="openai/whisper-small")
 def index(request):
     
     text = None
-    
+
     if request.method == "POST" and request.FILES.get("audio"):
         audio_file = request.FILES["audio"]
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
